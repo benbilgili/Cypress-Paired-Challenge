@@ -23,3 +23,13 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+const AdmZip = require('adm-zip');
+
+Cypress.Commands.add('unzipAndCountEntries', (filePath) => {
+  return new Promise((resolve, reject) => {
+    const zip = new AdmZip(filePath);
+    const zipEntries = zip.getEntries();
+    resolve(zipEntries.length);
+  });
+});
