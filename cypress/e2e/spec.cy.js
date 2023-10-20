@@ -3,7 +3,7 @@ describe('template spec', () => {
   // it('logs into TDG and generates data using a custom template', () => {
   //   cy.visit('https://develop.d3nylssqqiptjw.amplifyapp.com/')
   //   cy.get('.nav-links-container a').eq(1).click()
-  //   cy.get('select').select('Pair Program Template');
+  //   cy.get('select').select('Personal');
   //   cy.get('#submit-template').click();
   //   cy.get('#json-btn').click();
   //   cy.get('#generate-values').click();
