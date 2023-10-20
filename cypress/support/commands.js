@@ -24,12 +24,45 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-const AdmZip = require('adm-zip');
+// cypress/plugins/index.js
+const unzipper = require('unzipper');
 
-Cypress.Commands.add('unzipAndCountEntries', (filePath) => {
-  return new Promise((resolve, reject) => {
-    const zip = new AdmZip(filePath);
-    const zipEntries = zip.getEntries();
-    resolve(zipEntries.length);
+
+Cypress.Commands.add('unzipFile', ({ zipData, extractionPath }) => {
+    return new Promise((resolve, reject) => {
+      const zipBlob = Cypress.Blob.binaryBufferToBlob(zipData, 'application/zip');
+      const readable = new Cypress.Blob.Readable(zipBlob);
+  
+      const writable = new Cypress.Blob.WritableStream();
+  
+      writable.on('finish', () => {
+        resolve();
+      });
+  
+      writable.on('error', (error) => {
+        reject(error);
+      });
+  
+      readable.pipe(unzipper.Extract({ path: extractionPath })).pipe(writable);
+    });
   });
-});
+
+module.exports = (on, config) => {
+  on('task', {
+    unzipFile({ zipFilePath, extractionPath }) {
+      return new Promise((resolve, reject) => {
+        const readStream = fs.createReadStream(zipFilePath);
+
+        readStream
+          .pipe(unzipper.Extract({ path: extractionPath }))
+          .on('finish', () => {
+            resolve();
+          })
+          .on('error', (error) => {
+            reject(error);
+          });
+      });
+    },
+  });
+};
+
